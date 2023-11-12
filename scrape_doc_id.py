@@ -12,8 +12,7 @@ import time
 
 from database2 import select_all, insert_doc_id, update_input2
 
-# def run_scraper(count_, docname_, usstate_):
-command = "google-chrome --user-data-dir=$HOME/docinfo3 --proxy-server=127.0.0.1:8080 --remote-debugging-port=9222 --remote-allow-origins=http://localhost:9222 --blink-settings=imagesEnabled=false"
+command = "google-chrome --user-data-dir=$HOME/docinfo8 --proxy-server=138.197.224.38:16236 --remote-debugging-port=9222 --remote-allow-origins=http://localhost:9222 --blink-settings=imagesEnabled=false"
 chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                   stderr=subprocess.DEVNULL, close_fds=True)
 time.sleep(5)
@@ -110,6 +109,7 @@ for row in all_input_data:
     next_page = False
     for index in range(1):
         if index == 0:
+            print(f"name: {docname} index: {row_id}")
             chrome.Page.navigate(url=f"https://www.docinfo.org/search/?practype=Physician&docname={docname}&usstate={state}&token=")
             time.sleep(random.randint(3, 5))
         else:
@@ -125,8 +125,7 @@ for row in all_input_data:
                         }
                         getDocumentSource();
                     """
-        # javascript_code = 'console.log("Hello from JavaScript!");'
-        # javascript_code = "document.querySelector('.js-encode-search').click();"
+
         result = chrome.Runtime.evaluate(expression=get_page_source_js)
         html_source_listing = result[0]['result']['result']['value']
         soup = BeautifulSoup(html_source_listing, 'html.parser')
@@ -179,22 +178,5 @@ for row in all_input_data:
                 location_json = json.dumps(location_list)
                 insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state, specialty, search_name, gender, docid, location_json, row_id)
             update_input2(row_id)
-        pagination_element = soup.find('ul', class_='pagination__list search-results__pagination pagination--top')
-        if pagination_element is not None:
-            li_elems = pagination_element.find_all('li')
-            for li_elem in li_elems:
-                if 'Next' in li_elem.text:
-                    print('go to the next page')
-                    next_page = True
-                    break
-            if next_page:
-                continue
-            else:
-                print('no more next page')
-                update_input2(row_id)
-                break
-        else:
-            print('no more next page')
-            update_input2(row_id)
-            break
+
 chrome.Browser.close()

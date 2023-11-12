@@ -98,11 +98,11 @@ def insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state
         # pass
 
 
-def update_input2(row_id):
+def update_input2(row_id, done=True):
     try:
         with conn().cursor() as cursor:
-            update = "UPDATE `docinfo_input2` SET `done` = True WHERE `id` = %s;"
-            cursor.execute(update, row_id)
+            update = "UPDATE `docinfo_input2` SET `done` = %s WHERE `id` = %s;"
+            cursor.execute(update, (done, row_id))
     except Exception as e:
         print(e)
 
@@ -112,8 +112,10 @@ def select_all():
         with conn().cursor() as cursor:
             select_sql = "SELECT * FROM docinfo_org.docinfo_input2 where done is NULL limit 100;"
             cursor.execute(select_sql)
-            data = cursor.fetchall()
-            return data
+            data_ = cursor.fetchall()
+            for item in data_:
+                rowid = item['id']
+                update_input2(rowid, False)
     except Exception as e:
         print(e)
 
