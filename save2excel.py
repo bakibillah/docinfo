@@ -1,14 +1,12 @@
 import pandas as pd
-
 from database2 import conn
-
 import json
 
 
 def get_doc_id():
     try:
         with conn().cursor() as cursor:
-            select_sql = "SELECT * FROM `doc_id2` where done is TRUE;"
+            select_sql = "SELECT * FROM `doc_id2` where done is TRUE limit 500000;"
             cursor.execute(select_sql)
             data_ = cursor.fetchall()
             return data_
@@ -21,14 +19,19 @@ new_data = []
 n = 0
 for data_dict in data:
     n += 1
-    print(n)
+
+    id_ = data_dict['id']
+    # print(n, id_)
+    if n < 250001:
+        continue
+
     new_data_dict = {}
     for key, value in data_dict.items():
         # print(f"{key} = {key}")
         if key == 'specialty':
             key = 'specialization'
             new_data_dict[key] = value
-        elif key == 'actions' or key == 'done' or key == 'id' or key == 'row_id':
+        elif key in ['done', 'id', 'row_id', 'extracted_location_path_1', 'extracted_location_path_2', 'extracted_location_path_4', 'extracted_location_path_5']:
             continue
         elif key == 'full_name':
             key = 'csv_full_name'
@@ -38,7 +41,7 @@ for data_dict in data:
             new_data_dict[key] = value
         elif key == 'locations':
             value = json.loads(value)
-            location = " | ".join(item for item in value)
+            location = " | ".join(item for item in value if item != '-')
             new_data_dict[key] = location
         elif key == 'search_name':
             key = 'dFull_Name'
@@ -67,7 +70,9 @@ for data_dict in data:
             new_data_dict[key] = value
         elif key == 'locations_in_profile':
             value = json.loads(value)
-            location = " | ".join(item for item in value)
+            # print(f"{n}: {len(value)}")
+            location = " | ".join(item for item in value if item != '-')
+            print(location)
             key = 'dReported_Locations'
             new_data_dict[key] = location
         elif key == 'educations':
@@ -92,20 +97,9 @@ for data_dict in data:
         else:
             new_data_dict[key] = value
     new_data.append(new_data_dict)
-    # locations = item['locations_in_profile']
-    # educations = item['educations']
-    # year_of_graduation = item['certification']
-    # certifications = item['locations_in_profile']
-    # licenses = item['licenses']
-    # print(locations)
-    # print(educations)
-    # print(year_of_graduation)
-    # print(certifications)
-    # print(licenses)
 
 
 df = pd.DataFrame(new_data)
-excel_file_path = '500k_profiles.xlsx'
+excel_file_path = '250-500k_profiles.xlsx'
 df.to_excel(excel_file_path, index=False)
-
 

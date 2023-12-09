@@ -69,8 +69,8 @@ state_map = {
 
 def conn():
     return pymysql.connect(host='localhost',
-                           user='smartbot',
-                           password='TalhaZubayer789*',
+                           user='myrvtrader',
+                           password='Rvtrader123!',
                            database='docinfo_org',
                            charset='utf8mb4',
                            autocommit=True,
@@ -90,7 +90,7 @@ def update_doc_id(row_id, locations_in_profile, educations, certification, licen
 def get_doc_id():
     try:
         with conn().cursor() as cursor:
-            select_sql = "SELECT * FROM docinfo_org.doc_id2 where done is NULL order by id desc limit 500;"
+            select_sql = "SELECT * FROM docinfo_org.doc_id2 where done is NULL order by id desc limit 100;"
             cursor.execute(select_sql)
             data_ = cursor.fetchall()
 

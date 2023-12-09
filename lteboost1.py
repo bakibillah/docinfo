@@ -73,7 +73,7 @@ state_map = {
     "WY": "Wyoming"
     }
 
-proxy_to_test = '65.21.25.28:1037:KlbNcNG3nZ:DoYXg5YHlx'
+proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
 
 
 def test_proxy(proxy, timeout=5):
@@ -156,11 +156,11 @@ def get_cookie(chrome_, ip_):
             print(e)
 
 
-command = "google-chrome --user-data-dir=$HOME/lteboost-1037 --proxy-server=65.21.25.28:1037 --remote-debugging-port=9233 --remote-allow-origins=http://localhost:9233"
+command = "google-chrome --user-data-dir=$HOME/1037 --proxy-server=65.21.25.28:1039 --remote-debugging-port=10391 --remote-allow-origins=http://localhost:10391"
 chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
 time.sleep(5)
 
-chrome = PyChromeDevTools.ChromeInterface(port=9233)
+chrome = PyChromeDevTools.ChromeInterface(port=10391)
 
 chrome.Network.enable()
 chrome.Page.enable()
@@ -222,7 +222,7 @@ while True:
             session.headers = burp0_headers
             try:
                 ip = test_proxy(proxy_to_test, 5, )
-                res = session.get(burp0_url, proxy="http://KlbNcNG3nZ:DoYXg5YHlx@65.21.25.28:1037", cookies=burp0_cookies, timeout_seconds=10
+                res = session.get(burp0_url, proxy="http://cPyQtBjODE:pU8LsUM1l4@65.21.25.28:1039", cookies=burp0_cookies, timeout_seconds=10
                 )
                 print(burp0_url)
                 # proxy = "http://KlbNcNG3nZ:DoYXg5YHlx@65.21.25.28:1037",
@@ -266,4 +266,4 @@ while True:
                 print(e)
 
 
-chrome.Browser.close()
+# chrome.Browser.close()
