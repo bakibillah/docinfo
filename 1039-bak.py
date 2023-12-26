@@ -9,14 +9,22 @@ import json
 import subprocess
 
 
-proxy_to_test = '65.21.25.28:1064:dLhjFWwjGnxD:YKsFaGBGFY'
 
-
+proxy_to_test = '65.21.25.28:1039:9BeAXC3urY:ZFyLXaE14k'
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
 port = proxy_parts[1]
 username = proxy_parts[2]
 password = proxy_parts[3]
+
+
+def clear_cookies_except_domain(chrome_, domain_to_keep):
+    # chrome_.Network.enable()
+    cookies = chrome_.Network.getCookies()["cookies"]
+    cookies_to_clear = [cookie["name"] for cookie in cookies if domain_to_keep not in cookie["domain"]]
+
+    for cookie_name in cookies_to_clear:
+        chrome_.Network.deleteCookie(cookieName=cookie_name)
 
 
 def test_proxy(proxy, timeout=5):
@@ -87,7 +95,9 @@ def get_cookie(chrome_, ip_):
                     for cookie in cookies[0]['result']['cookies']:
                         if cookie['name'] == 'reese84':
                             token_value = cookie['value']
-                            chrome.Network.clearBrowserCookies()
+                            # chrome.Network.clearBrowserCookies()
+                            domain_to_keep = "google.com"
+                            clear_cookies_except_domain(chrome, domain_to_keep)
                             cookies = chrome.Network.getCookies()
                             print(f"Cookies after clearing: {cookies}")
                             chrome.Page.navigate(url="https://www.jsonip.com/")
@@ -98,7 +108,9 @@ def get_cookie(chrome_, ip_):
                 for cookie in cookies[0]['result']['cookies']:
                     if cookie['name'] == 'reese84':
                         token_value = cookie['value']
-                        chrome.Network.clearBrowserCookies()
+                        # chrome.Network.clearBrowserCookies()
+                        domain_to_keep = "google.com"
+                        clear_cookies_except_domain(chrome, domain_to_keep)
                         cookies = chrome.Network.getCookies()
                         print(f"Cookies after clearing: {cookies}")
                         chrome.Page.navigate(url="https://www.jsonip.com/")
@@ -106,20 +118,22 @@ def get_cookie(chrome_, ip_):
                 # break
         except Exception as e:
             print(e)
-    chrome.Network.clearBrowserCookies()
+    # chrome.Network.clearBrowserCookies()
+    domain_to_keep = "google.com"
+    clear_cookies_except_domain(chrome, domain_to_keep)
     cookies = chrome.Network.getCookies()
     print(f"Cookies after clearing: {cookies}")
     chrome.Page.navigate(url="https://www.jsonip.com/")
 
 
-command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
+command = f"google-chrome --user-data-dir=$HOME/1039-2 --proxy-server={ip_address}:{port} --remote-debugging-port=10392 --remote-allow-origins=http://localhost:10392"
 chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
 time.sleep(1)
 
 break_while = True
 while break_while:
     time.sleep(2)
-    chrome = PyChromeDevTools.ChromeInterface(port=port)
+    chrome = PyChromeDevTools.ChromeInterface(port=10392)
     chrome.Network.enable()
     chrome.Page.enable()
     chrome.DOM.enable()
@@ -148,8 +162,8 @@ while break_while:
                          "_ga_NTPKCKQSFL": ""}
 
         burp0_headers = {"Sec-Ch-Ua": "\"Chromium\";v=\"112\", \"Not;A=Brand\";v=\"8\"", "Sec-Ch-Ua-Mobile": "?0",
-                         "Sec-Ch-Ua-Platform": "\"Windows\"", "Upgrade-Insecure-Requests": "1",
-                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                         "Sec-Ch-Ua-Platform": "\"Linux\"", "Upgrade-Insecure-Requests": "1",
+                         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
                          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                          "Sec-Fetch-Site": "none", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-User": "?1",
                          "Sec-Fetch-Dest": "document", "Accept-Encoding": "gzip, deflate, br",

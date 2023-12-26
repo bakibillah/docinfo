@@ -9,7 +9,13 @@ import json
 import subprocess
 
 
-proxy_to_test = '65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
+
+
+proxy_parts = proxy_to_test.split(':')
+ip_address = proxy_parts[0]
+port = proxy_parts[1]
+username = proxy_parts[2]
+password = proxy_parts[3]
 
 
 def test_proxy(proxy, timeout=5):
@@ -45,8 +51,9 @@ def get_cookie(chrome_, ip_):
         time.sleep(2)
         print(f"ip_: {ip_} and _ip: {_ip}")
 
-    url = "https://www.docinfo.org:443/search/docprofile?docid=7C468AA8-A15F-4951-A14F-07119858FD7D&token="
+    url = "https://www.docinfo.org/"
     chrome_.Page.navigate(url=url)
+    time.sleep(5)
     event, messages = chrome_.wait_event("Page.frameStoppedLoading", timeout=60)
     value = chrome_.wait_event("Network.responseReceived", timeout=60)
 
@@ -79,6 +86,10 @@ def get_cookie(chrome_, ip_):
                     for cookie in cookies[0]['result']['cookies']:
                         if cookie['name'] == 'reese84':
                             token_value = cookie['value']
+                            chrome.Network.clearBrowserCookies()
+                            cookies = chrome.Network.getCookies()
+                            print(f"Cookies after clearing: {cookies}")
+                            chrome.Page.navigate(url="https://www.jsonip.com/")
                             return token_value
                     # break
             else:
@@ -86,20 +97,28 @@ def get_cookie(chrome_, ip_):
                 for cookie in cookies[0]['result']['cookies']:
                     if cookie['name'] == 'reese84':
                         token_value = cookie['value']
+                        chrome.Network.clearBrowserCookies()
+                        cookies = chrome.Network.getCookies()
+                        print(f"Cookies after clearing: {cookies}")
+                        chrome.Page.navigate(url="https://www.jsonip.com/")
                         return token_value
                 # break
         except Exception as e:
             print(e)
+    chrome.Network.clearBrowserCookies()
+    cookies = chrome.Network.getCookies()
+    print(f"Cookies after clearing: {cookies}")
+    chrome.Page.navigate(url="https://www.jsonip.com/")
 
 
-command = "google-chrome --user-data-dir=$HOME/1055 --proxy-server=65.21.25.28:1055 --remote-debugging-port=1055 --remote-allow-origins=http://localhost:1055"
+command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port}"
 chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
-time.sleep(5)
+time.sleep(1)
 
 break_while = True
 while break_while:
     time.sleep(2)
-    chrome = PyChromeDevTools.ChromeInterface(port=1055)
+    chrome = PyChromeDevTools.ChromeInterface(port=port)
     chrome.Network.enable()
     chrome.Page.enable()
     chrome.DOM.enable()
@@ -118,7 +137,9 @@ while break_while:
         row_id = doc_id['id']
 
         burp0_url = f"https://www.docinfo.org:443/search/docprofile?docid={doc_id_}&token="
-
+        if reese84 is None:
+            reese84 = get_cookie(chrome, '127.0.0.1')
+            continue
         burp0_cookies = {"visid_incap_2587692": "", "ai_user": "", "incap_ses_872_2587692": "", "nlbi_2587692": "",
                          "reese84": reese84, "ASP.NET_SessionId": "", "ARRAffinity": "", "ARRAffinitySameSite": "",
                          "_gid": "", "_gat_UA-40572798-14": "", "_ga": "", "ai_session": "",
@@ -137,9 +158,7 @@ while break_while:
         session.headers = burp0_headers
         try:
             ip = test_proxy(proxy_to_test, 5)
-            res = session.get(burp0_url, proxy="http://Nl3M3rzLizCz:z6q2jUC1oR@65.21.25.28:1055", cookies=burp0_cookies,
-                              timeout_seconds=10
-                              )
+            res = session.get(burp0_url, proxy=f"http://{username}:{password}@{ip_address}:{port}", cookies=burp0_cookies,  timeout_seconds=10)
             print(burp0_url)
             html_source = res.text
             soup = BeautifulSoup(html_source, 'html.parser')

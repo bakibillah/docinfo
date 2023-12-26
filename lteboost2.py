@@ -73,8 +73,8 @@ state_map = {
     "WY": "Wyoming"
     }
 
-proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
-# proxy_to_test = '65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
+# proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
+proxy_to_test = '65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
 
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
@@ -244,8 +244,7 @@ while True:
             session.headers = burp0_headers
             try:
                 ip = test_proxy(proxy_to_test, 5, )
-                res = session.get(burp0_url, proxy=f"http://{username}:{password}@65.21.25.28:{port}", cookies=burp0_cookies, timeout_seconds=10
-                )
+                res = session.get(burp0_url, proxy=f"http://{username}:{password}@65.21.25.28:{port}", cookies=burp0_cookies, timeout_seconds=10)
                 print(burp0_url)
                 # proxy = "http://KlbNcNG3nZ:DoYXg5YHlx@65.21.25.28:1037",
                 html_source = res.text
