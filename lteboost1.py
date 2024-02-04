@@ -73,8 +73,8 @@ state_map = {
     "WY": "Wyoming"
     }
 
-proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
-# proxy_to_test = '65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
+proxy_to_test = '65.21.25.28:1033:ZhRumNydNX:OyzOyXxNbJ'
+# proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
 
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
@@ -95,7 +95,7 @@ def test_proxy(proxy, timeout=5):
             session = requests.Session()
             session.proxies = {'http': f'http://{username}:{password}@{ip_address}:{port}',
                                'https': f'http://{username}:{password}@{ip_address}:{port}'}
-            response = session.get('https://www.jsonip.com', timeout=timeout)
+            response = session.get('https://ipinfo.io/103.166.74.116?token=b729cb93a83a78', timeout=timeout)
             if response.status_code == 200:
                 print(f"The proxy {proxy} is live: {response.json()['ip']}")
                 return response.json()['ip']
@@ -135,6 +135,16 @@ def get_cookie(chrome_, ip_):
             break
         try:
             result = chrome_.Runtime.evaluate(expression=get_page_source_js)
+            if result[0] is None:
+                cookies = chrome_.Network.getAllCookies()
+                for cookie in cookies[0]['result']['cookies']:
+                    if cookie['name'] == 'reese84':
+                        token_value = cookie['value']
+                        chrome.Network.clearBrowserCookies()
+                        cookies = chrome.Network.getCookies()
+                        print(f"Cookies after clearing: {cookies}")
+                        chrome.Page.navigate(url="https://www.google.com/")
+                        return token_value
             html_source_listing = result[0]['result']['result']['value']
             soup_ = BeautifulSoup(html_source_listing, 'html.parser')
             iframe_ = soup_.find('iframe')
@@ -154,7 +164,7 @@ def get_cookie(chrome_, ip_):
                             chrome.Network.clearBrowserCookies()
                             cookies = chrome.Network.getCookies()
                             print(f"Cookies after clearing: {cookies}")
-                            chrome.Page.navigate(url="https://www.jsonip.com/")
+                            chrome.Page.navigate(url="https://www.google.com/")
                             return token_value
                     # break
             else:
@@ -165,7 +175,7 @@ def get_cookie(chrome_, ip_):
                         chrome.Network.clearBrowserCookies()
                         cookies = chrome.Network.getCookies()
                         print(f"Cookies after clearing: {cookies}")
-                        chrome.Page.navigate(url="https://www.jsonip.com/")
+                        chrome.Page.navigate(url="https://www.google.com/")
                         return token_value
                 # break
         except Exception as e:
@@ -173,7 +183,7 @@ def get_cookie(chrome_, ip_):
     chrome.Network.clearBrowserCookies()
     cookies = chrome.Network.getCookies()
     print(f"Cookies after clearing: {cookies}")
-    chrome.Page.navigate(url="https://www.jsonip.com/")
+    chrome.Page.navigate(url="https://www.google.com/")
 
 
 command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server=65.21.25.28:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"

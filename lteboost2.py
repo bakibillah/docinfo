@@ -74,7 +74,7 @@ state_map = {
     }
 
 # proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
-proxy_to_test = '65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
+proxy_to_test = '65.21.25.28:1034:3kdBLFfdND:hfarnlS4Qo'
 
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]

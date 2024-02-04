@@ -4,114 +4,19 @@ import PyChromeDevTools
 import requests
 import tls_client
 from bs4 import BeautifulSoup
+from common import get_cookie, test_proxy
 from database2 import *
 import json
 import subprocess
 
 
-# proxy_to_test = '65.21.25.28:1064:dLhjFWwjGnxD:YKsFaGBGFY'
-proxy_to_test = '65.21.25.28:1036:hzmfbp8m6I:ceppz6Nm9C'
-
+proxy_to_test = '65.21.25.28:1034:3kdBLFfdND:hfarnlS4Qo'
+# proxy_to_test = '65.21.25.28:1060:DEx4GMcTW25u:2MUQdyqjDa'
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
 port = proxy_parts[1]
 username = proxy_parts[2]
 password = proxy_parts[3]
-
-
-def test_proxy(proxy, timeout=5):
-    proxy_live_status: bool = False
-    while not proxy_live_status:
-        try:
-            proxy_parts = proxy.split(':')
-            ip_address = proxy_parts[0]
-            port = proxy_parts[1]
-            username = proxy_parts[2]
-            password = proxy_parts[3]
-            session = requests.Session()
-            session.proxies = {'http': f'http://{username}:{password}@{ip_address}:{port}',
-                               'https': f'http://{username}:{password}@{ip_address}:{port}'}
-            response = session.get('https://www.jsonip.com', timeout=timeout)
-            if response.status_code == 200:
-                print(f"The proxy {proxy} is live: {response.json()['ip']}")
-                return response.json()['ip']
-            else:
-                time.sleep(1)
-                print(f"The proxy {proxy} returned a non-200 status code: {response.status_code}")
-                proxy_live_status = False
-        except requests.RequestException as e:
-            time.sleep(1)
-            print(f"Error testing proxy {proxy}: {e}")
-            proxy_live_status = False
-
-
-def get_cookie(chrome_, ip_):
-    _ip = test_proxy(proxy_to_test, 5)
-    while ip_ == _ip:
-        _ip = test_proxy(proxy_to_test, 5)
-        time.sleep(2)
-        print(f"ip_: {ip_} and _ip: {_ip}")
-
-    url = "https://www.docinfo.org/"
-    chrome_.Page.navigate(url=url)
-    time.sleep(5)
-    event, messages = chrome_.wait_event("Page.frameStoppedLoading", timeout=60)
-    value = chrome_.wait_event("Network.responseReceived", timeout=60)
-
-    get_page_source_js = """
-                    function getDocumentSource() {
-                        return document.documentElement.outerHTML;
-                    }
-                    getDocumentSource();
-                """
-    while_count = 0
-    while True:
-        while_count += 1
-        if while_count > 20:
-            break
-        try:
-            result = chrome_.Runtime.evaluate(expression=get_page_source_js)
-            html_source_listing = result[0]['result']['result']['value']
-            if result[0] is None:
-                return None
-            soup_ = BeautifulSoup(html_source_listing, 'html.parser')
-            iframe_ = soup_.find('iframe')
-            if iframe_:
-                iframe_src_ = iframe_.get('src')
-                if iframe_src_ is None:
-                    break
-                if '_Incapsula_Resource' in iframe_src_:
-                    print(f'{while_count}: captcha appeared, so solve it manually')
-                    time.sleep(3)
-                    continue
-                else:
-                    cookies = chrome_.Network.getAllCookies()
-                    for cookie in cookies[0]['result']['cookies']:
-                        if cookie['name'] == 'reese84':
-                            token_value = cookie['value']
-                            chrome.Network.clearBrowserCookies()
-                            cookies = chrome.Network.getCookies()
-                            print(f"Cookies after clearing: {cookies}")
-                            chrome.Page.navigate(url="https://www.jsonip.com/")
-                            return token_value
-                    # break
-            else:
-                cookies = chrome_.Network.getAllCookies()
-                for cookie in cookies[0]['result']['cookies']:
-                    if cookie['name'] == 'reese84':
-                        token_value = cookie['value']
-                        chrome.Network.clearBrowserCookies()
-                        cookies = chrome.Network.getCookies()
-                        print(f"Cookies after clearing: {cookies}")
-                        chrome.Page.navigate(url="https://www.jsonip.com/")
-                        return token_value
-                # break
-        except Exception as e:
-            print(e)
-    chrome.Network.clearBrowserCookies()
-    cookies = chrome.Network.getCookies()
-    print(f"Cookies after clearing: {cookies}")
-    chrome.Page.navigate(url="https://www.jsonip.com/")
 
 
 command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
@@ -125,13 +30,12 @@ while break_while:
     chrome.Network.enable()
     chrome.Page.enable()
     chrome.DOM.enable()
-    reese84 = get_cookie(chrome, "127.0.0.1")
+    reese84 = get_cookie(chrome, "127.0.0.1", proxy_to_test)
     print(reese84)
     all_doc_id = get_doc_id()
     if len(all_doc_id) == 0:
         print('no doc id left to scrape data')
-        # break_while = False
-        time.sleep(60)
+        break_while = False
         continue
     n = 0
     for doc_id in all_doc_id:
@@ -146,7 +50,7 @@ while break_while:
 
         burp0_url = f"https://www.docinfo.org:443/search/docprofile?docid={doc_id_}&token="
         if reese84 is None:
-            reese84 = get_cookie(chrome, '127.0.0.1')
+            reese84 = get_cookie(chrome, '127.0.0.1', proxy_to_test)
             continue
         burp0_cookies = {"visid_incap_2587692": "", "ai_user": "", "incap_ses_872_2587692": "", "nlbi_2587692": "",
                          "reese84": reese84, "ASP.NET_SessionId": "", "ARRAffinity": "", "ARRAffinitySameSite": "",
@@ -156,7 +60,7 @@ while break_while:
 
         burp0_headers = {"Sec-Ch-Ua": "\"Chromium\";v=\"112\", \"Not;A=Brand\";v=\"8\"", "Sec-Ch-Ua-Mobile": "?0",
                          "Sec-Ch-Ua-Platform": "\"Windows\"", "Upgrade-Insecure-Requests": "1",
-                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                          "Sec-Fetch-Site": "none", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-User": "?1",
                          "Sec-Fetch-Dest": "document", "Accept-Encoding": "gzip, deflate, br",
@@ -175,7 +79,7 @@ while break_while:
                 iframe_src = iframe.get('src')
                 if '_Incapsula_Resource' in iframe_src:
                     print('captcha appeared, so solve it manually. now switching to browser')
-                    reese84 = get_cookie(chrome, ip)
+                    reese84 = get_cookie(chrome, ip, proxy_to_test)
                     time.sleep(3)
                     continue
                 else:
