@@ -4,13 +4,13 @@ import PyChromeDevTools
 import requests
 import tls_client
 from bs4 import BeautifulSoup
-from database2 import *
+from database2 import get_doc_id, update_doc_id
 import json
 import subprocess
 
 
 # proxy_to_test = '65.21.25.28:1064:dLhjFWwjGnxD:YKsFaGBGFY'
-proxy_to_test = '65.21.25.28:1036:hzmfbp8m6I:ceppz6Nm9C'
+proxy_to_test = '65.21.25.28:1033:ZhRumNydNX:7lo6o5yO4g'
 
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
@@ -31,10 +31,10 @@ def test_proxy(proxy, timeout=5):
             session = requests.Session()
             session.proxies = {'http': f'http://{username}:{password}@{ip_address}:{port}',
                                'https': f'http://{username}:{password}@{ip_address}:{port}'}
-            response = session.get('https://www.jsonip.com', timeout=timeout)
+            response = session.get('https://icanhazip.com', timeout=timeout)
             if response.status_code == 200:
-                print(f"The proxy {proxy} is live: {response.json()['ip']}")
-                return response.json()['ip']
+                print(f"The proxy {proxy} is live: {response.text}")
+                return response.text.split()
             else:
                 time.sleep(1)
                 print(f"The proxy {proxy} returned a non-200 status code: {response.status_code}")
@@ -92,7 +92,7 @@ def get_cookie(chrome_, ip_):
                             chrome.Network.clearBrowserCookies()
                             cookies = chrome.Network.getCookies()
                             print(f"Cookies after clearing: {cookies}")
-                            chrome.Page.navigate(url="https://www.jsonip.com/")
+                            chrome.Page.navigate(url="https://www.google.com/")
                             return token_value
                     # break
             else:
@@ -103,7 +103,7 @@ def get_cookie(chrome_, ip_):
                         chrome.Network.clearBrowserCookies()
                         cookies = chrome.Network.getCookies()
                         print(f"Cookies after clearing: {cookies}")
-                        chrome.Page.navigate(url="https://www.jsonip.com/")
+                        chrome.Page.navigate(url="https://www.google.com/")
                         return token_value
                 # break
         except Exception as e:
@@ -111,7 +111,7 @@ def get_cookie(chrome_, ip_):
     chrome.Network.clearBrowserCookies()
     cookies = chrome.Network.getCookies()
     print(f"Cookies after clearing: {cookies}")
-    chrome.Page.navigate(url="https://www.jsonip.com/")
+    chrome.Page.navigate(url="https://www.google.com/")
 
 
 command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
@@ -167,6 +167,10 @@ while break_while:
         try:
             ip = test_proxy(proxy_to_test, 5)
             res = session.get(burp0_url, proxy=f"http://{username}:{password}@{ip_address}:{port}", cookies=burp0_cookies,  timeout_seconds=10)
+
+            if res.status_code == 403:
+                print(f"{row_id}: status code is 403, {burp0_url}")
+                continue
             print(burp0_url)
             html_source = res.text
             soup = BeautifulSoup(html_source, 'html.parser')

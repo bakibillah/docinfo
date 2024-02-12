@@ -9,7 +9,8 @@ import urllib.parse
 import requests
 from bs4 import BeautifulSoup
 import time
-from database2 import *
+
+from database2 import select_all, insert_doc_id, update_input2
 
 state_map = {
     "AL": "Alabama",
@@ -73,7 +74,7 @@ state_map = {
     "WY": "Wyoming"
     }
 
-proxy_to_test = '65.21.25.28:1033:ZhRumNydNX:OyzOyXxNbJ'
+proxy_to_test = '65.21.25.28:1063:cpABS3ky9v78:DOlzoyMYAu'
 # proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
 
 proxy_parts = proxy_to_test.split(':')
@@ -95,10 +96,10 @@ def test_proxy(proxy, timeout=5):
             session = requests.Session()
             session.proxies = {'http': f'http://{username}:{password}@{ip_address}:{port}',
                                'https': f'http://{username}:{password}@{ip_address}:{port}'}
-            response = session.get('https://ipinfo.io/103.166.74.116?token=b729cb93a83a78', timeout=timeout)
+            response = session.get('https://icanhazip.com:443/', timeout=timeout)
             if response.status_code == 200:
-                print(f"The proxy {proxy} is live: {response.json()['ip']}")
-                return response.json()['ip']
+                print(f"The proxy {proxy} is live: {response.text}")
+                return response.text.strip()
             else:
                 time.sleep(1)
                 print(f"The proxy {proxy} returned a non-200 status code: {response.status_code}")
@@ -211,14 +212,22 @@ while True:
         middle_name = row['middle_name']
         last_name = row['last_name']
         age = row['age']
-        state = row['state']
+        state_original = row['state']
         specialty = row['specialty']
         if middle_name == '' or middle_name is None:
             docname = f"{first_name}+{last_name}"
         else:
             docname = f"{first_name}+{middle_name}+{last_name}"
-        if state is None:
+
+        state_split = state_original.split("|")[0]
+        if state_split is None:
             continue
+        state = ''
+        try:
+            # this is applicable for new set of input data
+            state = state_map[state_split]
+        except KeyError:
+            pass
         next_page = False
         for index in range(1):
             session = tls_client.Session(
@@ -254,8 +263,8 @@ while True:
             session.headers = burp0_headers
             try:
                 ip = test_proxy(proxy_to_test, 5, )
-                res = session.get(burp0_url, proxy=f"http://{username}:{password}@65.21.25.28:{port}", cookies=burp0_cookies, timeout_seconds=10
-                )
+                res = session.get(burp0_url, proxy=f"http://{username}:{password}@65.21.25.28:{port}", cookies=burp0_cookies, timeout_seconds=10)
+
                 print(burp0_url)
                 # proxy = "http://KlbNcNG3nZ:DoYXg5YHlx@65.21.25.28:1037",
                 html_source = res.text

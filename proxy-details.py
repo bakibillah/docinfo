@@ -1,11 +1,2 @@
-'65.21.25.28:1056:pLOnBu7JphmR:qIoPKF6cb6' using 1056.py
-'65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4' offline
-
-'65.21.25.28:1039:9BeAXC3urY:ZFyLXaE14k' lteboost1.py
-'65.21.25.28:1055:Nl3M3rzLizCz:z6q2jUC1oR'
-'65.21.25.28:1064:dLhjFWwjGnxD:YKsFaGBGFY' using 1064.py
-'65.21.25.28:1060:DEx4GMcTW25u:2MUQdyqjDa' offline
-
-# 65.21.25.28:1033:ZhRumNydNX:OyzOyXxNbJ lteboost1
-65.21.25.28:1036:hzmfbp8m6I:ceppz6Nm9C 1064
-65.21.25.28:1034:3kdBLFfdND:hfarnlS4Qo 1056
+65.21.25.28:1063:cpABS3ky9v78:DOlzoyMYAu
+65.21.25.28:1033:ZhRumNydNX:7lo6o5yO4g

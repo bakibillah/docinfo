@@ -80,7 +80,7 @@ def conn():
 def update_doc_id(row_id, locations_in_profile, educations, certification, licenses, actions, done=True):
     try:
         with conn().cursor() as cursor:
-            update = 'UPDATE `doc_id2` SET `locations_in_profile`=%s, `educations`=%s, `certification`=%s, `licenses`=%s, `actions`=%s, done=%s WHERE `id` =%s;'
+            update = 'UPDATE `doc_id_master` SET `locations_in_profile`=%s, `educations`=%s, `certification`=%s, `licenses`=%s, `actions`=%s, done=%s WHERE `id` =%s;'
             cursor.execute(update, (locations_in_profile, educations, certification, licenses, actions, done, str(row_id)))
             print(f"saved successfully {row_id}")
     except Exception as e:
@@ -90,7 +90,7 @@ def update_doc_id(row_id, locations_in_profile, educations, certification, licen
 def get_doc_id():
     try:
         with conn().cursor() as cursor:
-            select_sql = "SELECT * FROM docinfo_org.doc_id2 where done is NULL order by id desc limit 100;"
+            select_sql = "SELECT * FROM docinfo_org.doc_id_master where done is NULL order by id desc limit 100;"
             cursor.execute(select_sql)
             data_ = cursor.fetchall()
 
@@ -117,7 +117,7 @@ def insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state
 
     try:
         with conn().cursor() as cursor:
-            insert_sql = "INSERT INTO `doc_id2` (`npi`, `full_name`, `first_name`, `middle_name`, `last_name`, `age`, `state`, `specialty`, `href`, `search_name`, `gender`, `locations`, `row_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            insert_sql = "INSERT INTO `doc_id_master` (`npi`, `full_name`, `first_name`, `middle_name`, `last_name`, `age`, `state`, `specialty`, `href`, `search_name`, `gender`, `locations`, `row_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
             cursor.execute(insert_sql, (npi, full_name, first_name, middle_name, last_name, age, state, specialty, href, search_name, gender, location, row_id))
             print("success", npi, full_name, first_name, middle_name, last_name, age, state, specialty, href, search_name, gender, location, row_id)
     except Exception as e:
@@ -137,7 +137,7 @@ def update_input2(row_id, done=True):
 def update_docid(row_id, done=True):
     try:
         with conn().cursor() as cursor:
-            update = "UPDATE `doc_id2` SET `done` = %s WHERE `id` = %s;"
+            update = "UPDATE `doc_id_master` SET `done` = %s WHERE `id` = %s;"
             cursor.execute(update, (done, row_id))
     except Exception as e:
         print(e)
