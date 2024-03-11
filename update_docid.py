@@ -10,7 +10,32 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-from database2 import select_all, insert_doc_id, update_input2, get_name_n_location
+from database2 import conn
+
+
+def update_docid(docid_docid, rowid, done=None):
+    try:
+        with conn().cursor() as cursor:
+            update = "UPDATE `docinfo_org`.`doc_id_master` SET `doc_id` =%s, `done`=%s id = %s;"
+            update_count = cursor.execute(update, (docid_docid, rowid))
+            print(f"updated {update_count}")
+    except Exception as e:
+        print(e)
+
+
+def select_all():
+    try:
+        with conn().cursor() as cursor:
+            select_sql = "SELECT * FROM docinfo_org.doc_id_master where done = False limit 100;"
+            cursor.execute(select_sql)
+            data_ = cursor.fetchall()
+            # for item in data_:
+            #     rowid = item['id']
+            #     update_input2(rowid, False)
+            return data_
+    except Exception as e:
+        print(e)
+
 
 state_map = {
     "AL": "Alabama",
@@ -202,6 +227,8 @@ data = []
 while True:
     all_input_data = select_all()
     reese84 = get_cookie(chrome, "127.0.0.1")
+    if reese84 is None:
+        print("reese84 token is none when first attempting to get cookies")
     for row in all_input_data:
         docname = ""
         usstate = ""
@@ -214,6 +241,14 @@ while True:
         age = row['age']
         state_original = row['state']
         specialty = row['specialty']
+        locations_in_profile = row['locations']
+        if locations_in_profile is None:
+            print(f"{row_id} has no locations, so continue")
+            continue
+
+        locations_in_profile_list = json.loads(locations_in_profile)
+        # locations_in_profile_list = [item for item in locations if item != '-']
+
         if middle_name == '' or middle_name is None:
             docname = f"{first_name}+{last_name}"
         else:
@@ -297,12 +332,10 @@ while True:
                                     location_list.append(text)
                                 except IndexError:
                                     location_list.append("-")
-                            location_json = json.dumps(location_list)
-                            # print(npi, full_name, first_name, middle_name, last_name, age, state, specialty, docid, search_name, gender, location_json, row_id)
-                            insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state, specialty, docid, search_name, gender, location_json, row_id)
+                            if location_list[0] == locations_in_profile_list[0]:
 
-                        update_input2(row_id)
-
+                                print(row_id, docid, search_name, locations_in_profile, locations_in_profile_list)
+                                # update_docid(docid_docid=docid, rowid=row_id)
             except Exception as e:
                 print(e)
 

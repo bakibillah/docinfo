@@ -157,6 +157,17 @@ def select_all():
         print(e)
 
 
+def get_name_n_location():
+    try:
+        with conn().cursor() as cursor:
+            select_sql = "SELECT `search_name`, `locations` FROM docinfo_org.doc_id_master;"
+            cursor.execute(select_sql)
+            data_ = cursor.fetchall()
+            return data_
+    except Exception as e:
+        print(e)
+
+
 csv_file = '500k_docinfo.csv'
 data = []
 # with open(csv_file, 'r', newline='') as file:
