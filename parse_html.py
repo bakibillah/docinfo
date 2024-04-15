@@ -713,7 +713,7 @@ profile_sections = soup.find_all('div', class_='profile__section')
 for elem in profile_sections:
     headline = elem.find('h2').text.strip()
     if headline == 'Education':
-        print(elem.find('p').text)
+        print('education: ', elem.find('p').text)
     elif headline == 'Certifications':
         all_certification = elem.find_all('ul')
         for each_certification in all_certification:
@@ -725,4 +725,4 @@ for elem in profile_sections:
     elif headline == 'Actions':
         all_actions = elem.find_all('ul')
         for all_action in all_actions:
-            print(all_action.text)
+            print('actions: ', all_action.text)

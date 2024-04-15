@@ -1,5 +1,9 @@
-xxx = "/search/docprofile?docid=0BD6BB7A-A0F0-4E8C-9392-6CACE95FACCE&docname=OLUWATOYIN FUNMILAYO OLATINWO&usstate=Louisiana&practype=all"
+import json
 
-xy = xxx.split("=")[1].split("&")[0]
+# Open the JSON file
+with open('Us.json', 'r') as file:
+    # Load the JSON data into a Python dictionary
+    data = json.load(file)
 
-print(xy)
+# Now, 'data' contains the contents of the JSON file as a dictionary
+print(data)
