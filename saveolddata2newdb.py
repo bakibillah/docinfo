@@ -16,8 +16,8 @@ import pymysql
 
 def conn():
     return pymysql.connect(host='localhost',
-                           user='smartbot',
-                           password='TalhaZubayer789*',
+                           user='myrvtrader',
+                           password='Rvtrader123!',
                            database='docinfo_org',
                            charset='utf8mb4',
                            autocommit=True,
@@ -28,8 +28,8 @@ def update_doc_id(npi, full_name, first_name, middle_name, last_name, age, state
                   locations, row_id, locations_in_profile, educations, certification, licenses, actions, done):
     try:
         with conn().cursor() as cursor:
-            update = "INSERT INTO `doc_id2` (`npi`, `full_name`, `first_name`, `middle_name`, `last_name`, `age`, `state`, `specialty`, `search_name`, `gender`, `href`, `locations`, `row_id`, `locations_in_profile`, `educations`, `certification`, `licenses`, `actions`, `done`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-            cursor.execute(update, (
+            insert = "INSERT INTO `doc_id_master2` (`npi`, `full_name`, `first_name`, `middle_name`, `last_name`, `age`, `state`, `specialty`, `search_name`, `gender`, `href`, `locations`, `row_id`, `locations_in_profile`, `educations`, `certification`, `licenses`, `actions`, `done`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            cursor.execute(insert, (
             npi, full_name, first_name, middle_name, last_name, age, state, specialty, search_name, gender, href,
             locations, row_id, locations_in_profile, educations, certification, licenses, actions, done))
     except Exception as e:
@@ -39,7 +39,7 @@ def update_doc_id(npi, full_name, first_name, middle_name, last_name, age, state
 def get_doc_id():
     try:
         with conn().cursor() as cursor:
-            select_sql = "SELECT * FROM docinfo_org.doc_id where done is TRUE;"
+            select_sql = "SELECT * FROM docinfo_org.doc_id_master limit 10000;"
             cursor.execute(select_sql)
             data_ = cursor.fetchall()
             return data_

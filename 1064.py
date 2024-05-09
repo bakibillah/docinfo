@@ -10,7 +10,7 @@ import subprocess
 
 
 # proxy_to_test = '65.21.25.28:1064:dLhjFWwjGnxD:YKsFaGBGFY'
-proxy_to_test = '65.21.25.28:1033:ZhRumNydNX:7lo6o5yO4g'
+proxy_to_test = '65.21.25.28:1036:FsYCA7XCkf:xHgGXLv19d'
 
 proxy_parts = proxy_to_test.split(':')
 ip_address = proxy_parts[0]
@@ -114,7 +114,7 @@ def get_cookie(chrome_, ip_):
     chrome.Page.navigate(url="https://www.google.com/")
 
 
-command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
+command = f"google-chrome --user-data-dir=$HOME/1033 --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
 chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
 time.sleep(1)
 

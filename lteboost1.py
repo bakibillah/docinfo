@@ -72,9 +72,9 @@ state_map = {
     "WV": "West Virginia",
     "WI": "Wisconsin",
     "WY": "Wyoming"
-    }
+}
 
-proxy_to_test = '65.21.25.28:1063:cpABS3ky9v78:DOlzoyMYAu'
+proxy_to_test = '65.21.25.28:1040:09rPFmJhUh:r951Ue1Uk3'
 # proxy_to_test = '65.21.25.28:1039:cPyQtBjODE:pU8LsUM1l4'
 
 proxy_parts = proxy_to_test.split(':')
@@ -187,8 +187,9 @@ def get_cookie(chrome_, ip_):
     chrome.Page.navigate(url="https://www.google.com/")
 
 
-command = f"google-chrome --user-data-dir=$HOME/{port} --proxy-server=65.21.25.28:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
-chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, close_fds=True)
+command = f"google-chrome --user-data-dir=$HOME/1063 --proxy-server={ip_address}:{port} --remote-debugging-port={port} --remote-allow-origins=http://localhost:{port} --user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'"
+chrome_process = subprocess.Popen(command, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL, close_fds=True)
 time.sleep(5)
 
 chrome = PyChromeDevTools.ChromeInterface(port=port)
@@ -263,7 +264,8 @@ while True:
             session.headers = burp0_headers
             try:
                 ip = test_proxy(proxy_to_test, 5, )
-                res = session.get(burp0_url, proxy=f"http://{username}:{password}@65.21.25.28:{port}", cookies=burp0_cookies, timeout_seconds=10)
+                res = session.get(burp0_url, proxy=f"http://{username}:{password}@{ip_address}:{port}",
+                                  cookies=burp0_cookies, timeout_seconds=10)
 
                 print(burp0_url)
                 # proxy = "http://KlbNcNG3nZ:DoYXg5YHlx@65.21.25.28:1037",
@@ -298,13 +300,14 @@ while True:
                                 except IndexError:
                                     location_list.append("-")
                             location_json = json.dumps(location_list)
+                            # first_middle_last_ = search_name[0].split(' ')
                             # print(npi, full_name, first_name, middle_name, last_name, age, state, specialty, docid, search_name, gender, location_json, row_id)
-                            insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state, specialty, docid, search_name, gender, location_json, row_id)
+                            insert_doc_id(npi, full_name, first_name, middle_name, last_name, age, state, specialty,
+                                          docid, search_name, gender, location_json, row_id)
 
                         update_input2(row_id)
 
             except Exception as e:
                 print(e)
-
 
 # chrome.Browser.close()
